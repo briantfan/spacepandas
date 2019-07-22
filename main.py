@@ -10,8 +10,8 @@ while True:
     if Button.DOWN in brick.buttons():
         robot.forward(10) 
     elif Button.LEFT in brick.buttons():
-        robot.turnRight(90)
+        robot.turn_right(90)
     elif Button.RIGHT in brick.buttons():
-        robot.turnLeft(90)
+        robot.turn_left(90)
     elif Button.CENTER in brick.buttons():
         robot.line_follow(20)

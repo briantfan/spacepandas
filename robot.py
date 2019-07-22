@@ -10,6 +10,7 @@ from pybricks.robotics import DriveBase
 
 class Robot:
 
+    # This is the number of degrees a wheel needs to turn to move one inch.
     DEGREES_PER_INCH = 360 / 11.6
 
     def __init__(self):
@@ -39,7 +40,7 @@ class Robot:
         # do something
         self.stop()
 
-    def turnRight(self, degrees):
+    def turn_right(self, degrees):
         turning_speed = -120
         start_angle = self.gyro_sensor.angle()
         stop_angle = start_angle + degrees
@@ -48,7 +49,7 @@ class Robot:
             self.left_wheel.run(turning_speed)
         self.stop()
 
-    def turnLeft(self, degrees):
+    def turn_left(self, degrees):
         turning_speed = -120
         start_angle = self.gyro_sensor.angle()
         stop_angle = start_angle - degrees
