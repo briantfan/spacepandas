@@ -24,38 +24,45 @@ class Robot:
         self.right_wheel.stop(Stop.BRAKE)
         self.left_wheel.stop(Stop.BRAKE)
 
-    def positive_speed(self, min_speed, max_speed, start_angle, stop_angle, current_angle):
-        slow_angle = stop_angle - max_speed
-        middle_angle = (start_angle + stop_angle) / 2
-        if slow_angle < middle_angle:
-            slow_angle = middle_angle
-        if current_angle < slow_angle:
-            speed = current_angle - start_angle
-            if speed > max_speed:
-                speed = max_speed
-        else:
-            speed = stop_angle - current_angle
-            if speed < min_speed:
-                speed = min_speed
-        return speed
-
-    def negative_speed(self, min_speed, max_speed, start_angle, stop_angle, current_angle):
-        slow_angle = stop_angle - max_speed
-        middle_angle = (start_angle + stop_angle) / 2
-        if slow_angle > middle_angle:
-            slow_angle = middle_angle
-        if current_angle > slow_angle:
-            speed = current_angle - start_angle
-            if speed < max_speed:
-                speed = max_speed
-        else:
-            speed = stop_angle - current_angle
+    def check_speed(self, speed, min_speed, max_speed):
+        if min_speed < 0:
+            # We are moving in the negative direction.
             if speed > min_speed:
-                speed = min_speed
+                return min_speed
+            if speed < max_speed:
+                return max_speed
+        else:
+            # We are moving in the positive direction.
+            if speed < min_speed:
+                return min_speed
+            if speed > max_speed:
+                return max_speed
+        return speed
+    
+    def calculate_speed(self, min_speed, max_speed, start_angle, stop_angle, current_angle):
+        slow_angle = stop_angle - max_speed
+        middle_angle = (start_angle + stop_angle) / 2
+        if min_speed < 0:
+            # We are moving in the negative direction.
+            if slow_angle > middle_angle:
+                slow_angle = middle_angle
+            if current_angle > slow_angle:
+                speed = current_angle - start_angle
+            else:
+                speed = stop_angle - current_angle
+        else:
+            # We are moving in the positive direction.
+            if slow_angle < middle_angle:
+                slow_angle = middle_angle
+            if current_angle < slow_angle:
+                speed = current_angle - start_angle
+            else:
+                speed = stop_angle - current_angle
+        speed = self.check_speed(speed, min_speed, max_speed)
         return speed
 
     def forward(self, inches):
-        min_speed = -50
+        min_speed = -100
         max_speed = -500
         degrees_to_move = inches * self.DEGREES_PER_INCH
         start_wheel_angle = self.left_wheel.angle()
@@ -63,16 +70,16 @@ class Robot:
         print("Degrees: ", degrees_to_move, "Start: ", start_wheel_angle, " Stop: ", stop_wheel_angle)
         start_gyro_angle = self.gyro_sensor.angle()
         while self.left_wheel.angle() > stop_wheel_angle:
-            speed = self.negative_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
+            speed = self.calculate_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * 100 / speed
+            correction = gyro_error * 50 / speed
             self.left_wheel.run(speed + correction)
             self.right_wheel.run(speed - correction)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", speed, "Error: ", gyro_error, " Correction: ", correction)
         self.stop()
 
     def backward(self, inches):
-        min_speed = 50
+        min_speed = 100
         max_speed = 500
         degrees_to_move = inches * self.DEGREES_PER_INCH
         start_wheel_angle = self.left_wheel.angle()
@@ -80,7 +87,7 @@ class Robot:
         print("Degrees: ", degrees_to_move, "Start: ", start_wheel_angle, " Stop: ", stop_wheel_angle)
         start_gyro_angle = self.gyro_sensor.angle()
         while self.left_wheel.angle() < stop_wheel_angle:
-            speed = self.positive_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
+            speed = self.calculate_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
             correction = gyro_error * 100 / current_speed
             self.right_wheel.run(current_speed - correction)
@@ -162,14 +169,14 @@ class Robot:
         self.stop()
 
     def smooth_move_forward(self, inches):
-        min_speed = -50
+        min_speed = -100
         max_speed = -500
         degrees_to_move = inches * self.DEGREES_PER_INCH
         start_wheel_angle = self.left_wheel.angle()
         stop_wheel_angle = start_wheel_angle - degrees_to_move
         print("Degrees: ", degrees_to_move, "Start: ", start_wheel_angle, " Stop: ", stop_wheel_angle)
         while self.left_wheel.angle() > stop_wheel_angle:
-            speed = self.negative_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
+            speed = self.calculate_speed(min_speed, max_speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
             self.left_wheel.run(speed)
             self.right_wheel.run(speed)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", speed)
