@@ -1,25 +1,28 @@
 #!/usr/bin/env pybricks-micropython
 
+import time
 from pybricks import ev3brick as brick
 from pybricks.parameters import Button
 from pybricks.tools import print, wait, StopWatch
 import robot
-import bike
 
-bike.watchDistance()
+import bike
+import traffic_jam
+import tree
 
 robot = robot.Robot()
 stopwatch = StopWatch()
 stopwatch.reset()
 
+traffic_jam.run(robot)
+#tree.run(robot)
+
 time = stopwatch.time()
 brick.display.text(time)
 
 count = 0
-while True:
-#    if stopwatch.time() >= 10000 and stopwatch.time() < 10100:
-#        print("10 sec: ", count)
-#    count = count + 1
+
+while False:
     if Button.UP in brick.buttons():
         start_angle = robot.gyro_sensor.angle()
         robot.backward(30)
