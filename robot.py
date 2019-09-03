@@ -12,14 +12,23 @@ from pybricks.robotics import DriveBase
 DEGREES_PER_INCH = 360 / 11.6
 
 # These are the min and max speeds we use for driving and turning.
-MIN_FORWARD_SPEED = -50
+MIN_FORWARD_SPEED = -60
 MAX_FORWARD_SPEED = -500
-MIN_BACKWARD_SPEED = 50
+MIN_BACKWARD_SPEED = 60
 MAX_BACKWARD_SPEED = 500
-MIN_RIGHT_TURN_SPEED = 50
+
+DEFAULT_MOVE_ACCELERATION = 16
+DEFAULT_MOVE_DECELERATION = 32
+
+MIN_RIGHT_TURN_SPEED = 60
 MAX_RIGHT_TURN_SPEED = 150
-MIN_LEFT_TURN_SPEED = -50
+MIN_LEFT_TURN_SPEED = -60
 MAX_LEFT_TURN_SPEED = -150
+
+DEFAULT_TURN_ACCELERATION = 16
+DEFAULT_TURN_DECELERATION = 16
+
+LINE_FOLLOW_SPEED = -150
 
 class Robot:
 
@@ -64,18 +73,8 @@ class Robot:
                 return max_speed
         return speed
     
-    def calculate_run_speed(self, min_speed, max_speed, current_speed, start_angle, stop_angle, current_angle):
-        # The acceleration factor for driving straight is 8.
-        # The deceleration factor for driving straight is 2.
-        return self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, current_angle, 16, 2)
-
-    def calculate_turn_speed(self, min_speed, max_speed, current_speed, start_angle, stop_angle, current_angle):
-        # The acceleration factor for turning is 8.
-        # The deceleration factor for turning is 4.
-        return self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, current_angle, 16, 4)
-
     def calculate_speed(self, min_speed, max_speed, current_speed, start_angle, stop_angle, current_angle, accel, decel):
-        decel_angle = stop_angle - (max_speed / decel)
+        decel_angle = stop_angle - ((current_speed - min_speed) / (decel / accel))
         middle_angle = (start_angle + stop_angle) / 2
         if min_speed < 0:
             # We are moving in the negative direction, so angles and speed are negative.
@@ -83,85 +82,78 @@ class Robot:
                 decel_angle = middle_angle
             if current_angle > decel_angle:
                 speed = current_speed - accel
-                #speed = accel * (current_angle - start_angle)
             else:
-                #speed = current_speed + decel
-                speed = decel * (stop_angle - current_angle)
+                speed = current_speed + decel
         else:
             # We are moving in the positive direction, so angles and speed are positive.
             if decel_angle < middle_angle:
                 decel_angle = middle_angle
             if current_angle < decel_angle:
                 speed = current_speed + accel
-                print("  ", decel_angle, "  ", middle_angle, " accel to: ", speed)
-                #speed = accel * (current_angle - start_angle)
             else:
-                #speed = current_speed - decel
-                speed = decel * (stop_angle - current_angle)
-                print("  ", decel_angle, "  ", middle_angle, " decel to: ", speed)
+                speed = current_speed - decel
         speed = self.check_speed(speed, min_speed, max_speed)
         return speed
 
-    def forward(self, inches):
+    def forward(self, inches, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION):
         degrees_to_move = inches * DEGREES_PER_INCH
-        start_wheel_angle = self.left_wheel.angle()
-        stop_wheel_angle = start_wheel_angle - degrees_to_move
-        print("Inches in Degrees: ", degrees_to_move, "Start: ", start_wheel_angle, " Stop: ", stop_wheel_angle)
+        start_angle = self.left_wheel.angle()
+        stop_angle = start_angle - degrees_to_move
+        print("Inches in Degrees: ", degrees_to_move, "Start: ", start_angle, " Stop: ", stop_angle)
         start_gyro_angle = self.gyro_sensor.angle()
-        speed = MIN_FORWARD_SPEED
-        while self.left_wheel.angle() > stop_wheel_angle:
-            speed = self.calculate_run_speed(MIN_FORWARD_SPEED, MAX_FORWARD_SPEED, speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
+        current_speed = min_speed
+        while self.left_wheel.angle() > stop_angle:
+            current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * 400 / speed
-            self.left_wheel.run(speed + correction)
-            self.right_wheel.run(speed - correction)
-            print("Angle: ", self.left_wheel.angle(), " Speed: ", speed, "Error: ", gyro_error, " Correction: ", correction)
+            correction = gyro_error * 400 / current_speed
+            self.left_wheel.run(current_speed + correction)
+            self.right_wheel.run(current_speed - correction)
+            print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
         self.stop()
 
-    def backward(self, inches):
+    def backward(self, inches, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION):
         degrees_to_move = inches * DEGREES_PER_INCH
-        start_wheel_angle = self.left_wheel.angle()
-        stop_wheel_angle = start_wheel_angle + degrees_to_move
-        print("Inches in Degrees: ", degrees_to_move, "Start: ", start_wheel_angle, " Stop: ", stop_wheel_angle)
+        start_angle = self.left_wheel.angle()
+        stop_angle = start_angle + degrees_to_move
+        print("Inches in Degrees: ", degrees_to_move, "Start: ", start_angle, " Stop: ", stop_angle)
         start_gyro_angle = self.gyro_sensor.angle()
-        speed = MIN_BACKWARD_SPEED
-        while self.left_wheel.angle() < stop_wheel_angle:
-            speed = self.calculate_run_speed(MIN_BACKWARD_SPEED, MAX_BACKWARD_SPEED, speed, start_wheel_angle, stop_wheel_angle, self.left_wheel.angle())
+        current_speed = min_speed
+        while self.left_wheel.angle() < stop_angle:
+            current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * 400 / speed
-            self.left_wheel.run(speed - correction)
-            self.right_wheel.run(speed + correction)
-            print("Angle: ", self.left_wheel.angle(), " Speed: ", speed, "Error: ", gyro_error, " Correction: ", correction)
+            correction = gyro_error * 400 / current_speed
+            self.left_wheel.run(current_speed - correction)
+            self.right_wheel.run(current_speed + correction)
+            print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
         self.stop()
 
-    def turn_right(self, degrees):
+    def turn_right(self, degrees, min_speed=MIN_RIGHT_TURN_SPEED, max_speed=MAX_RIGHT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
         start_angle = self.gyro_sensor.angle()
         stop_angle = start_angle + degrees - 1
         print("Turn Right: ", degrees, " Start at: ", start_angle, " Stop at: ", stop_angle)
-        speed = MIN_RIGHT_TURN_SPEED
+        right_speed = min_speed
         while self.gyro_sensor.angle() < stop_angle:
-            right_speed = self.calculate_turn_speed(MIN_RIGHT_TURN_SPEED, MAX_RIGHT_TURN_SPEED, speed, start_angle, stop_angle, self.gyro_sensor.angle())
+            right_speed = self.calculate_speed(min_speed, max_speed, right_speed, start_angle, stop_angle, self.gyro_sensor.angle(), accel, decel)
             left_speed = right_speed * -1
             self.right_wheel.run(right_speed)
             self.left_wheel.run(left_speed)
-            print("Angle: ", self.gyro_sensor.angle())
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
 
-    def turn_left(self, degrees):
+    def turn_left(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
         start_angle = self.gyro_sensor.angle()
         stop_angle = start_angle - degrees + 1
         print("Turn Left: ", degrees, " Start at: ", start_angle, " Stop at: ", stop_angle)
-        speed = MIN_LEFT_TURN_SPEED
+        right_speed = min_speed
         while self.gyro_sensor.angle() > stop_angle:
-            right_speed = self.calculate_turn_speed(MIN_LEFT_TURN_SPEED, MAX_LEFT_TURN_SPEED, speed, start_angle, stop_angle, self.gyro_sensor.angle())
+            right_speed = self.calculate_speed(min_speed, max_speed, right_speed, start_angle, stop_angle, self.gyro_sensor.angle(), accel, decel)
             left_speed = right_speed * -1
             self.right_wheel.run(right_speed)
             self.left_wheel.run(left_speed)
-            print("Angle: ", self.gyro_sensor.angle())
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
 
-    def line_follow(self, inches):
-        speed = -160
+    def line_follow(self, inches, speed=LINE_FOLLOW_SPEED):
         degrees_to_move = inches * DEGREES_PER_INCH
         start_wheel_angle = self.left_wheel.angle()
         stop_wheel_angle = start_wheel_angle - degrees_to_move
@@ -174,8 +166,7 @@ class Robot:
             self.right_wheel.run(speed - correction)
         self.stop()
         
-    def ultrasonic_line_follow(self, mm):
-        speed = -200
+    def ultrasonic_line_follow(self, mm, speed=LINE_FOLLOW_SPEED):
         start_angle = self.gyro_sensor.angle()
         line_follow = True
         while True:
