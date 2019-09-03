@@ -167,6 +167,7 @@ class Robot:
         self.stop()
         
     def ultrasonic_line_follow(self, mm, speed=LINE_FOLLOW_SPEED):
+        current_speed = speed
         start_angle = self.gyro_sensor.angle()
         line_follow = True
         while True:
@@ -176,16 +177,16 @@ class Robot:
                 left_reflection = self.color_sensor_left.reflection()
                 diff = (right_reflection - left_reflection)
                 correction = diff
-            self.left_wheel.run(speed + correction)
-            self.right_wheel.run(speed - correction)
+            self.left_wheel.run(current_speed + correction)
+            self.right_wheel.run(current_speed - correction)
             if abs(self.gyro_sensor.angle() - start_angle) < 2:
                 distance = self.ultrasonic_sensor.distance()
                 if distance >= mm:
                     brick.sound.beep(600, 10, 30)
                     break
-                if distance - 200 >= mm:
+                if distance - speed >= mm:
                     brick.sound.beep(500, 10, 30)
-                    speed = distance - mm - 20
+                    current_speed = distance - mm - 20
                 if distance > 1240:
                     brick.sound.beep(400, 10, 30)
                     line_follow = True
