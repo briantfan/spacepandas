@@ -18,9 +18,9 @@ def run(robot):
     robot.left_motor.run_angle(-300, 100, Stop.COAST)
     robot.right_motor_run_angle(-800, 900, Stop.COAST)
     robot.left_motor.run_angle(500, 200, Stop.COAST)
-    robot.backward(15, accel = 4
+    robot.backward(15, accel = 4)
     robot.turn_right(135)
-    robot.backward(13)
-    robot.forward(6.5)
+    robot.backward(12)
+    robot.forward(7)
     robot.turn_right(80)
     robot.forward(28)
