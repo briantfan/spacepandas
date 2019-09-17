@@ -194,3 +194,13 @@ class Robot:
                     brick.sound.beep(300, 10, 30)
                     line_follow = False
         self.stop()
+
+    def move_to_line(self):
+        speed=150
+        self.left_wheel.run(speed)
+        self.right_wheel.run(speed)
+        while self.color_sensor_left.reflection() < 70:
+            pass
+        #while self.color_sensor_left.reflection() > 20:
+            #pass
+        self.stop()
