@@ -13,5 +13,5 @@ import robot
 def run(robot):
     robot.forward(27)
     robot.backward(6)
-    robot.turn_right(90)
+    robot.turn_left(90)
     robot.forward(20)

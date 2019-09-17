@@ -11,15 +11,16 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    robot.forward(32)
-    for i in range(100):
-        robot.left_wheel.run(-50 - i)
-    robot.left_wheel.stop(Stop.BRAKE)
-    robot.left_motor.run_angle(-400, 270, Stop.BRAKE)
-    robot.right_motor.run_angle(-400, 1140, Stop.BRAKE)
-    robot.left_motor.run_angle(500, 160, Stop.BRAKE)
-    robot.right_motor.run_angle(400, 250, Stop.BRAKE)
-    robot.left_motor.run_angle(500, 90, Stop.COAST)
-    robot.right_motor.run_angle(-500, 850, Stop.COAST)
-    time.sleep(1)
-    robot.backward(4)
+    robot.forward(32, max_speed = -360, decel = 8) #goes to tree
+    robot.left_motor.run_angle(-300, 300, Stop.BRAKE)
+    robot.right_motor_run_angle(-800, 1100, Stop.BRAKE)
+    robot.left_motor.run_angle(350, 250, Stop.BRAKE) #puts drone down
+    robot.left_motor.run_angle(-300, 100, Stop.COAST)
+    robot.right_motor_run_angle(-800, 900, Stop.COAST)
+    robot.left_motor.run_angle(500, 200, Stop.COAST)
+    robot.backward(15, accel = 4)
+    robot.turn_right(135)
+    robot.backward(12)
+    robot.forward(7)
+    robot.turn_right(80)
+    robot.forward(28) #goes home
