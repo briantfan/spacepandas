@@ -1,5 +1,6 @@
 #!/usr/bin/env pybricks-micropython
 
+import time
 from pybricks import ev3brick as brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -11,10 +12,9 @@ import time
 import robot
 
 def run(robot):
-    robot.backward(31.8)    #goes to crane and drops it
-    time.sleep(1)   #waits so it won't topple over
-    robot.forward(12.1) #backs up
-    #robot.turn_right(90)
-    robot.right_wheel.run_angle(200,110,Stop.BRAKE,False)
-    robot.left_wheel.run_angle(-200,110,Stop.BRAKE)
-    robot.forward(19.5)
+    robot.backward(31.8)
+    time.sleep(1)
+    robot.forward(12.1)
+    robot.right_wheel.run_angle(200, 110, Stop.BRAKE, False)
+    robot.left_wheel.run_angle(-200, 110, Stop.BRAKE)
+    robot.forward(19.3)

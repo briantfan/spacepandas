@@ -20,7 +20,7 @@ def run(robot):
     robot.left_motor.run_angle(500, 200, Stop.COAST)
     robot.backward(15, accel = 4)
     robot.turn_right(135)
-    robot.backward(10) #goes to crane
-    robot.forward(6.5)
+    robot.backward(12)
+    robot.forward(7)
     robot.turn_right(80)
     robot.forward(28) #goes home
