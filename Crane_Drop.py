@@ -8,6 +8,7 @@ from pybricks.parameters import (Port, Stop, Direction, Button, Color,
                                  SoundFile, ImageFile, Align)
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
+import time
 import robot
 
 def run(robot):
