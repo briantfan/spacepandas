@@ -195,7 +195,6 @@ class Robot:
                     line_follow = False
         self.stop()
 
-<<<<<<< HEAD
     def move_to_line(self):
         speed=150
         self.left_wheel.run(speed)
@@ -205,7 +204,6 @@ class Robot:
         #while self.color_sensor_left.reflection() > 20:
             #pass
         self.stop()
-=======
     def left_motor_run_angle(self, speed, angle, brake = Stop.BRAKE):
         self.motor_run_angle(self.left_motor, speed, angle, brake)
 
@@ -223,4 +221,3 @@ class Robot:
             while motor.angle() < target:
                 motor.run(speed)
         motor.stop(brake)
->>>>>>> 1298f248a126ab800ef2b336118d9ead00b1f947
