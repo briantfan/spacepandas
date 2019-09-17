@@ -40,7 +40,7 @@ class Robot:
         self.color_sensor_right = ColorSensor(Port.S2)
         self.color_sensor_left = ColorSensor(Port.S3)
         self.gyro_sensor = GyroSensor(Port.S4, Direction.CLOCKWISE)
-        self.ultrasonic_sensor = UltrasonicSensor(Port.S1)
+     #   self.ultrasonic_sensor = UltrasonicSensor(Port.S1)
         self.check_gyro()
         
     def check_gyro(self):
