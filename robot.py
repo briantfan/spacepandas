@@ -49,7 +49,7 @@ class Robot:
         wait(5000)  # wait 5 seconds
         if gyro_angle != self.gyro_sensor.angle():
             brick.sound.beep(400, 500, 30)
-            wait(10000)  # wait 10 seconds
+            wait(5000)  # wait 5 seconds
         else:
             brick.sound.beep()
 
@@ -194,3 +194,21 @@ class Robot:
                     brick.sound.beep(300, 10, 30)
                     line_follow = False
         self.stop()
+
+    def left_motor_run_angle(self, speed, angle, brake = Stop.BRAKE):
+        self.motor_run_angle(self.left_motor, speed, angle, brake)
+
+    def right_motor_run_angle(self, speed, angle, brake = Stop.BRAKE):
+        self.motor_run_angle(self.right_motor, speed, angle, brake)
+
+    def motor_run_angle(self, motor, speed, angle, brake):
+        target = motor.angle()
+        if speed < 0:
+            target = target - angle
+            while motor.angle() > target:
+                motor.run(speed)
+        else:
+            target = target + angle
+            while motor.angle() < target:
+                motor.run(speed)
+        motor.stop(brake)

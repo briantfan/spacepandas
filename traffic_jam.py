@@ -12,9 +12,12 @@ import robot
 def run(robot):
     robot.backward(19.25)
     robot.left_motor.run_angle(600, 590, Stop.BRAKE)
-    robot.left_motor.run_angle(-600, 200, Stop.BRAKE)
+    robot.left_motor.run_angle(-600, 150, Stop.BRAKE)
     robot.turn_left(25)
-    robot.backward(10)
-    robot.turn_right(180)
-    robot.forwrd(4)
-    robot.line_follow(-25)
+    robot.backward(14)
+    robot.turn_right(210)
+    #robot.forward(4)
+    brick.sound.beep()
+    robot.ultrasonic_line_follow(1000)
+    brick.sound.beep
+    robot.forward(10)
