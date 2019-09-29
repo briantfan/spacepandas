@@ -10,7 +10,18 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    robot.backward(32.5)
-    robot.forward(12.1)
-    robot.turn_right(90)
-    robot.forward(20)
+    robot.forward(12)
+    robot.line_follow(9.5)
+    robot.right_wheel.run_angle(100, -110, Stop.BRAKE)
+    robot.forward(4)
+    brick.sound.beep()
+    robot.turn_right(80)
+    robot.forward(4.5)
+    robot.turn_left(70)
+    robot.forward(14.5)
+    robot.turn_left(36)
+    robot.forward(7)
+    robot.backward(6.5)
+    robot.turn_left(40)
+    robot.line_follow(10)
+    robot.forward(26.5) 
