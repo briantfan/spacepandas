@@ -16,7 +16,7 @@ import Crane_Drop
 robot = robot.Robot()
 stopwatch = StopWatch()
 
-def show_time:
+def show_time():
     time = stopwatch.time()
     brick.display.text(time)
 
