@@ -40,7 +40,6 @@ class Robot:
         self.color_sensor_right = ColorSensor(Port.S2)
         self.color_sensor_left = ColorSensor(Port.S3)
         self.gyro_sensor = GyroSensor(Port.S4, Direction.CLOCKWISE)
-     #   self.ultrasonic_sensor = UltrasonicSensor(Port.S1)
         self.check_gyro()
         
     def check_gyro(self):
@@ -166,37 +165,8 @@ class Robot:
             self.right_wheel.run(speed - correction)
         self.stop()
         
-    def ultrasonic_line_follow(self, mm, speed=LINE_FOLLOW_SPEED):
-        current_speed = speed
-        start_angle = self.gyro_sensor.angle()
-        line_follow = True
-        while True:
-            correction = 0
-            if line_follow:
-                right_reflection = self.color_sensor_right.reflection()
-                left_reflection = self.color_sensor_left.reflection()
-                diff = (right_reflection - left_reflection)
-                correction = diff
-            self.left_wheel.run(current_speed + correction)
-            self.right_wheel.run(current_speed - correction)
-            if abs(self.gyro_sensor.angle() - start_angle) < 2:
-                distance = self.ultrasonic_sensor.distance()
-                if distance >= mm:
-                    brick.sound.beep(600, 10, 30)
-                    break
-                if distance - speed >= mm:
-                    brick.sound.beep(500, 10, 30)
-                    current_speed = distance - mm - 20
-                if distance > 1240:
-                    brick.sound.beep(400, 10, 30)
-                    line_follow = True
-                if distance > 1000:
-                    brick.sound.beep(300, 10, 30)
-                    line_follow = False
-        self.stop()
-
     def move_to_line(self):
-        speed=150
+        speed = 150
         self.left_wheel.run(speed)
         self.right_wheel.run(speed)
         while self.color_sensor_left.reflection() < 70:
@@ -204,6 +174,28 @@ class Robot:
         #while self.color_sensor_left.reflection() > 20:
             #pass
         self.stop()
+
+    def square_to_line(self):
+        speed = -100
+        stop_left = False
+        stop_right = False
+        while (not stop_left) or (not stop_right):
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            stop_left = stop_left or left_reflection < 20
+            stop_right = stop_right or right_reflection < 20
+            if (stop_left):
+                self.left_wheel.stop(Stop.BRAKE)
+            else:
+                self.left_wheel.run(speed + correction)
+            if (stop_right):
+                self.right_wheel.stop(Stop.BRAKE)
+            else:
+                self.right_wheel.run(speed - correction)
+        self.stop()
+
     def left_motor_run_angle(self, speed, angle, brake = Stop.BRAKE):
         self.motor_run_angle(self.left_motor, speed, angle, brake)
 

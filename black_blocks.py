@@ -1,6 +1,5 @@
 #!/usr/bin/env pybricks-micropython
 
-    robot.backward(12.1)
 from pybricks import ev3brick as brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
