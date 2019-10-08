@@ -152,11 +152,44 @@ class Robot:
             print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
 
+    def turn_left_absolute(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
+        right_speed = min_speed
+        while self.gyro_sensor.angle() > degrees:
+            self.right_wheel.run(-90)
+            self.left_wheel.run(90)
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
+        self.stop()
+
     def line_follow(self, inches, speed=LINE_FOLLOW_SPEED):
         degrees_to_move = inches * DEGREES_PER_INCH
         start_wheel_angle = self.left_wheel.angle()
         stop_wheel_angle = start_wheel_angle - degrees_to_move
         while self.left_wheel.angle() > stop_wheel_angle:
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            self.left_wheel.run(speed + correction)
+            self.right_wheel.run(speed - correction)
+        self.stop()
+
+    def line_follow_to_divot(self, speed=LINE_FOLLOW_SPEED):
+        biggest = 0
+        self.gyro_sensor.reset_angle(0)
+        while self.gyro_sensor.angle() < 15:
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            self.left_wheel.run(speed + correction)
+            self.right_wheel.run(speed - correction)
+            if (self.gyro_sensor.angle() > biggest):
+                biggest = self.gyro_sensor.angle()
+        brick.display.text(biggest)
+        self.stop()
+
+    def line_follow_to_end(self, speed=LINE_FOLLOW_SPEED):
+        while self.color_sensor_left.reflection() < 90 and self.color_sensor_right.reflection() < 90:
             right_reflection = self.color_sensor_right.reflection()
             left_reflection = self.color_sensor_left.reflection()
             diff = (right_reflection - left_reflection)
