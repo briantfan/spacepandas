@@ -10,7 +10,7 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    robot.forward(26)
+    robot.forward(27)
     robot.backward(6)
     robot.turn_left(90)
     robot.forward(20)
