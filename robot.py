@@ -189,7 +189,7 @@ class Robot:
         self.stop()
 
     def line_follow_to_end(self, speed=LINE_FOLLOW_SPEED):
-        while self.color_sensor_left.reflection() < 90 and self.color_sensor_right.reflection() < 90:
+        while self.color_sensor_left.reflection() < 95 and self.color_sensor_right.reflection() < 95:
             right_reflection = self.color_sensor_right.reflection()
             left_reflection = self.color_sensor_left.reflection()
             diff = (right_reflection - left_reflection)
