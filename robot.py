@@ -208,8 +208,7 @@ class Robot:
             #pass
         self.stop()
 
-    def square_to_line(self):
-        speed = -100
+    def square_to_black(self, speed = -100):
         stop_left = False
         stop_right = False
         while (not stop_left) or (not stop_right):
@@ -219,6 +218,26 @@ class Robot:
             correction = diff
             stop_left = stop_left or left_reflection < 20
             stop_right = stop_right or right_reflection < 20
+            if (stop_left):
+                self.left_wheel.stop(Stop.BRAKE)
+            else:
+                self.left_wheel.run(speed + correction)
+            if (stop_right):
+                self.right_wheel.stop(Stop.BRAKE)
+            else:
+                self.right_wheel.run(speed - correction)
+        self.stop()
+
+    def square_to_white(self, speed = 100):
+        stop_left = False
+        stop_right = False
+        while (not stop_left) or (not stop_right):
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            stop_left = stop_left or left_reflection > 80
+            stop_right = stop_right or right_reflection > 80
             if (stop_left):
                 self.left_wheel.stop(Stop.BRAKE)
             else:
