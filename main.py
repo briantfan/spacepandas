@@ -26,7 +26,7 @@ while True:
         tree.run(robot)
         show_time()
     elif Button.LEFT in brick.buttons():
-        Crane_Drop(robot)
+        Crane_Drop.run(robot)
         show_time()
     elif Button.CENTER in brick.buttons():
         black_blocks.run(robot)

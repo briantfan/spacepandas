@@ -12,9 +12,10 @@ import time
 import robot
 
 def run(robot):
-    robot.backward(31.8)
+    robot.backward(-31.8)
     time.sleep(1)
-    robot.forward(12.1)
-    robot.right_wheel.run_angle(200, 110, Stop.BRAKE, False)
-    robot.left_wheel.run_angle(-200, 110, Stop.BRAKE)
+    robot.forward(-12.1)
+    robot.right_wheel.run_angle(200, -110, Stop.BRAKE, False)
+    robot.left_wheel.run_angle(-200, -110, Stop.BRAKE)
     robot.forward(19.3)
+    
