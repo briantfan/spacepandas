@@ -10,19 +10,27 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    robot.forward(14.5)
-    robot.line_follow(7)
-    robot.right_wheel.run_angle(90, -110, Stop.BRAKE)
-    robot.forward(4)
-    robot.turn_right(80)
-    robot.forward(4.5)
-    robot.turn_left(70)
-    robot.forward(14.5)
-    robot.turn_left(34.4)
-    robot.forward(7.5)
-    robot.backward(7.5)
-    robot.turn_left(40)
-    robot.line_follow(9)
-    robot.square_to_line()
-    brick.sound.beep()
-    robot.forward(25, max_speed = -500) 
+   
+   # getting to the red circle
+   robot.forward (17)
+   robot.line_follow (16.5)
+   # lifting the thing keeping the red blocks with the robot
+   robot.left_motor.run_angle (300, -540)
+   # getting to the tan circle
+   robot.line_follow_to_divot() 
+   robot.turn_left(85, max_speed=-100)
+   robot.forward (16)
+   # backing out of the tan circle
+   robot.backward (9.5)
+   # getting to the elevator
+   robot.turn_right (25)
+   robot.forward (3)
+   robot.line_follow (10)
+   robot.forward (4)
+   # getting the elevator to balance
+   wait(2000)
+   # going up the ramp
+   robot.backward (15.5)
+   robot.turn_left(85)
+   robot.line_follow(10)
+   robot.forward (25)
