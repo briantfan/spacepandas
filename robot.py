@@ -29,6 +29,7 @@ DEFAULT_TURN_ACCELERATION = 16
 DEFAULT_TURN_DECELERATION = 16
 
 LINE_FOLLOW_SPEED = -150
+GYRO_CORRECTION = 800
 
 class Robot:
 
@@ -45,7 +46,7 @@ class Robot:
     def check_gyro(self):
         brick.sound.beep()
         gyro_angle = self.gyro_sensor.angle()
-        wait(5000)  # wait 5 seconds
+        wait(2000)  # wait 5 seconds
         if gyro_angle != self.gyro_sensor.angle():
             brick.sound.beep(400, 500, 30)
             wait(5000)  # wait 5 seconds
@@ -94,7 +95,7 @@ class Robot:
         speed = self.check_speed(speed, min_speed, max_speed)
         return speed
 
-    def forward(self, inches, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION):
+    def forward(self, inches, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
         degrees_to_move = inches * DEGREES_PER_INCH
         start_angle = self.left_wheel.angle()
         stop_angle = start_angle - degrees_to_move
@@ -104,13 +105,13 @@ class Robot:
         while self.left_wheel.angle() > stop_angle:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * 400 / current_speed
+            correction = gyro_error * gyro_correct / current_speed
             self.left_wheel.run(current_speed + correction)
             self.right_wheel.run(current_speed - correction)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
         self.stop()
 
-    def backward(self, inches, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION):
+    def backward(self, inches, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
         degrees_to_move = inches * DEGREES_PER_INCH
         start_angle = self.left_wheel.angle()
         stop_angle = start_angle + degrees_to_move
@@ -120,7 +121,7 @@ class Robot:
         while self.left_wheel.angle() < stop_angle:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * 400 / current_speed
+            correction = gyro_error * gyro_correct / current_speed
             self.left_wheel.run(current_speed - correction)
             self.right_wheel.run(current_speed + correction)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
@@ -155,8 +156,29 @@ class Robot:
     def turn_left_absolute(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
         right_speed = min_speed
         while self.gyro_sensor.angle() > degrees:
-            self.right_wheel.run(-90)
-            self.left_wheel.run(90)
+            self.right_wheel.run(min_speed)
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
+        self.stop()
+    
+    def turn_left_pivot(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
+        start_angle = self.gyro_sensor.angle()
+        stop_angle = start_angle - degrees + 1
+        print("Turn Left: ", degrees, " Start at: ", start_angle, " Stop at: ", stop_angle)
+        right_speed = min_speed
+        while self.gyro_sensor.angle() > stop_angle:
+            right_speed = self.calculate_speed(min_speed, max_speed, right_speed, start_angle, stop_angle, self.gyro_sensor.angle(), accel, decel)
+            self.right_wheel.run(right_speed)
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
+        self.stop()
+
+    def turn_left_pivot_back(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
+        start_angle = self.gyro_sensor.angle()
+        stop_angle = start_angle - degrees + 1
+        print("Turn Left: ", degrees, " Start at: ", start_angle, " Stop at: ", stop_angle)
+        right_speed = min_speed
+        while self.gyro_sensor.angle() > stop_angle:
+            right_speed = self.calculate_speed(min_speed, max_speed, right_speed, start_angle, stop_angle, self.gyro_sensor.angle(), accel, decel)
+            self.left_wheel.run(-1 * right_speed)
             print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
 
@@ -188,18 +210,17 @@ class Robot:
         brick.display.text(biggest)
         self.stop()
 
-    def line_follow_to_end(self, speed=LINE_FOLLOW_SPEED):
-        while self.color_sensor_left.reflection() < 95 and self.color_sensor_right.reflection() < 95:
+    def line_follow_to_black(self, speed=LINE_FOLLOW_SPEED):
+        while self.color_sensor_left.reflection() > 15 or self.color_sensor_right.reflection() > 15:
             right_reflection = self.color_sensor_right.reflection()
             left_reflection = self.color_sensor_left.reflection()
             diff = (right_reflection - left_reflection)
-            correction = diff
+            correction = diff / 2
             self.left_wheel.run(speed + correction)
             self.right_wheel.run(speed - correction)
         self.stop()
         
-    def move_to_line(self):
-        speed = 150
+    def move_to_line(self, speed=150):
         self.left_wheel.run(speed)
         self.right_wheel.run(speed)
         while self.color_sensor_left.reflection() < 70:

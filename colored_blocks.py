@@ -12,25 +12,18 @@ import robot
 def run(robot):
    
    # getting to the red circle
-   robot.forward (17)
-   robot.line_follow (16.5)
+   robot.forward(27)
    # lifting the thing keeping the red blocks with the robot
-   robot.left_motor.run_angle (300, -540)
+   robot.turn_left_pivot(45, min_speed=-150)
+   robot.turn_right(55)
+   robot.line_follow(4, speed=-80)
    # getting to the tan circle
-   robot.line_follow_to_divot()  # TODO: check to see if we should be turning slower here
-   robot.turn_left(85, max_speed=-100) # TODO: is absolute turn more accurate here?
-   robot.forward(16)
+   robot.line_follow_to_divot(speed=-60)
+   robot.turn_left_absolute(-77, min_speed=-150, max_speed=-150)
+   robot.forward(14.5)
    # backing out of the tan circle
-   robot.backward(9.5)
-   # getting to the elevator
-   robot.turn_right(25)
-   robot.forward(3) # TODO: move forward to line, then turn
-   robot.line_follow(10) # TODO: line follow to end
-   robot.forward(4)
-   # getting the elevator to balance
-   wait(2000)
+   robot.backward(7)
+   robot.turn_left_pivot_back(45)
    # going up the ramp
-   robot.backward(15.5) # TODO back up to line
-   robot.turn_left(85)
-   robot.line_follow(10) # TODO line follow to black line
-   robot.forward(25)
+   robot.line_follow_to_black()
+   robot.forward(28, max_speed=-300)
