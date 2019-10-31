@@ -10,20 +10,23 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-   
-   # getting to the red circle
+   # Move to the red circle.
    robot.forward(27)
-   # lifting the thing keeping the red blocks with the robot
+   # Push the red blocks into the circle.
    robot.turn_left_pivot(45, min_speed=-150)
    robot.turn_right(55)
+   # Follow the line a little bit to straighten out.
    robot.line_follow(4, speed=-80)
-   # getting to the tan circle
+   # Move to the divot in the line.
    robot.line_follow_to_divot(speed=-60)
+   # Turn and move into the tan circle.
    robot.turn_left_absolute(-77, min_speed=-150, max_speed=-150)
    robot.forward(14.5)
-   # backing out of the tan circle
+   # Back out of the tan circle.
    robot.backward(7)
+   # Turn and face the line.
    robot.turn_left_pivot_back(45)
-   # going up the ramp
+   # Follow the line to the ramp.
    robot.line_follow_to_black()
-   robot.forward(28, max_speed=-300)
+   # Move up the ramp to the flags.
+   robot.forward(28)

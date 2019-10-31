@@ -11,16 +11,24 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    robot.forward(32, max_speed = -360, decel = 8) #goes to tree
+    # Go to the tree.
+    robot.forward(32, max_speed = -360, decel = 8)
+    # Hook the drone
     robot.left_motor.run_angle(-300, 300, Stop.BRAKE)
+    # Lower the blocks and move the drone to the ramp.
     robot.right_motor_run_angle(-800, 1100, Stop.BRAKE)
-    robot.left_motor.run_angle(350, 250, Stop.BRAKE) #puts drone down
+    # Put the drone down.
+    robot.left_motor.run_angle(350, 250, Stop.BRAKE)
     robot.left_motor.run_angle(-300, 100, Stop.COAST)
+    # Lower the blocks.
     robot.right_motor_run_angle(-800, 900, Stop.COAST)
     robot.left_motor.run_angle(500, 200, Stop.COAST)
-    robot.backward(15, accel = 4)
+    # Back away slowly.
+    robot.backward(15, accel=4)
+    # Push the right crane lever.
     robot.turn_right(135)
     robot.backward(12)
+    # Backup and go home.
     robot.forward(7)
     robot.turn_right(80)
-    robot.forward(28) #goes home
+    robot.forward(28)
