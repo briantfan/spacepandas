@@ -1,7 +1,5 @@
 import time
-# Use this code library to control the Raspberry PI
 import RPi.GPIO as GPIO
-# Use the web server that's included in Python.
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 # This is where the web browser needs to go.
