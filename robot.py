@@ -61,6 +61,14 @@ class Robot:
     def stop(self):
         self.right_wheel.stop(Stop.BRAKE)
         self.left_wheel.stop(Stop.BRAKE)
+    
+    # Range check a value
+    def range_check(self, value, min, max):
+        if value < min:
+            return min
+        if value > max:
+            return max
+        return value
 
     # Make sure our speed is between the min_speed and max_speed
     def check_speed(self, speed, min_speed, max_speed):
@@ -114,7 +122,7 @@ class Robot:
         while self.left_wheel.angle() > stop_angle:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * gyro_correct / current_speed
+            correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
             self.left_wheel.run(current_speed + correction)
             self.right_wheel.run(current_speed - correction)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
@@ -131,7 +139,7 @@ class Robot:
         while self.left_wheel.angle() < stop_angle:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
-            correction = gyro_error * gyro_correct / current_speed
+            correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
             self.left_wheel.run(current_speed - correction)
             self.right_wheel.run(current_speed + correction)
             print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
