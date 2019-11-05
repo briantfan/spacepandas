@@ -20,7 +20,7 @@ def run(robot):
     # Wait for the block to fall.
     wait(1000)
     # Move the attachment away so it's not touching the blocks.
-    robot.backward(4)
+    robot.backward(3)
     # Turn and detach from the attachment.
     robot.turn_left(90, min_speed=-200, max_speed=-200)
     # Go back home.

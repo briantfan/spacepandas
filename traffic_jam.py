@@ -13,31 +13,22 @@ def run(robot):
     # Move to the traffic jam.
     robot.backward(19.25)
     # Pull up the traffic jam.
-    robot.left_motor.run_angle(600, 590, Stop.BRAKE)
-    robot.left_motor.run_angle(-600, 150, Stop.BRAKE)
+    robot.left_motor.run_angle(800, 600)
+    robot.left_motor.run_angle(-800, 170)
     # Turn and move toward the line.
     robot.turn_left(25)
-    robot.move_to_line()
+    robot.move_to_line_backwards()
     robot.turn_right(220)
     # Keep line following to go up the side of the board.
-    robot.line_follow(24, speed=-120)
+    robot.line_follow(25, speed=-120)
     # Knock the bar down on the swing.
-    robot.backward(2)
-    robot.turn_right(90)
-    robot.backward(10.5)
-    robot.turn_left(90)
-    # Square up to the tower.
-    robot.forward(14)
-    # Move to the steel construction.
-    robot.right_wheel.run_angle(100, 285)
-    robot.backward(6)
-    robot.left_wheel.run_angle(100, 65)
-    # Raise the tower.
-    robot.left_motor.run_angle(-600, 365, Stop.BRAKE)
-    # Drive around the elevator.
-    robot.backward(3.18)
-    robot.left_motor.run_angle(405, 440, Stop.BRAKE)
-    robot.forward(10)
-    robot.turn_left(105)
-    # Go home
-    robot.backward(72)
+    robot.turn_left_pivot_back(105, min_speed=-100)
+    robot.forward(8)
+    robot.move_to_line(5)
+    robot.turn_right(65)
+    robot.line_follow(12)
+    robot.line_follow_to_end(2)
+    robot.backward(6, max_speed=80)
+    robot.backward(18, decel=1000)
+    robot.turn_right(24, min_speed=120)
+    robot.backward(58, min_speed=200, max_speed=600)

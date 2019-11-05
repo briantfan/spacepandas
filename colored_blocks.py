@@ -11,9 +11,9 @@ import robot
 
 def run(robot):
    # Move to the red circle.
-   robot.forward(27)
+   robot.forward(26)
    # Push the red blocks into the circle.
-   robot.turn_left_pivot(45, min_speed=-150)
+   robot.turn_left_pivot(45, min_speed=-120)
    robot.turn_right(55)
    # Follow the line a little bit to straighten out.
    robot.line_follow(4, speed=-80)
@@ -29,4 +29,5 @@ def run(robot):
    # Follow the line to the ramp.
    robot.line_follow_to_black()
    # Move up the ramp to the flags.
-   robot.forward(28)
+   robot.backward(2)
+   robot.forward(30, decel=10000)

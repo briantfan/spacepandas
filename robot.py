@@ -42,6 +42,8 @@ class Robot:
         self.color_sensor_right = ColorSensor(Port.S2)
         self.color_sensor_left = ColorSensor(Port.S3)
         self.gyro_sensor = GyroSensor(Port.S4, Direction.CLOCKWISE)
+        self.left_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
+        self.right_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
         self.check_gyro()
 
     # Diagnostic test that will beep if the gyro is not calibrated.
@@ -196,6 +198,19 @@ class Robot:
             print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
 
+    # Turn right pivot use the gyro sensor to tell when to stop.
+    def turn_right_pivot(self, degrees, min_speed=MIN_RIGHT_TURN_SPEED, max_speed=MAX_RIGHT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
+        start_angle = self.gyro_sensor.angle()
+        stop_angle = start_angle + degrees - 1
+        print("Turn Right: ", degrees, " Start at: ", start_angle, " Stop at: ", stop_angle)
+        right_speed = min_speed
+        while self.gyro_sensor.angle() < stop_angle:
+            right_speed = self.calculate_speed(min_speed, max_speed, right_speed, start_angle, stop_angle, self.gyro_sensor.angle(), accel, decel)
+            left_speed = right_speed * -1
+            self.left_wheel.run(left_speed)
+            print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
+        self.stop()
+
     # Line follow for a certain distance. This can be inaccurate because of line following adjustments.
     def line_follow(self, inches, speed=LINE_FOLLOW_SPEED):
         degrees_to_move = inches * DEGREES_PER_INCH
@@ -237,8 +252,39 @@ class Robot:
             self.right_wheel.run(speed - correction)
         self.stop()
         
+    # Line follow for a certain distance. This can be inaccurate because of line following adjustments.
+    def line_follow_to_end(self, inches, speed=LINE_FOLLOW_SPEED):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        start_wheel_angle = self.left_wheel.angle()
+        stop_wheel_angle = start_wheel_angle - degrees_to_move
+        while self.left_wheel.angle() > stop_wheel_angle and self.color_sensor_left.reflection() < 80 and self.color_sensor_right.reflection() < 80:
+            if self.color_sensor_left.reflection() < 15 and self.color_sensor_right.reflection() < 15:
+                break
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            self.left_wheel.run(speed + correction)
+            self.right_wheel.run(speed - correction)
+        self.stop()
+
     # Move forward until we see a white line. No gyro corrections are made.
-    def move_to_line(self, speed=150):
+    def move_to_line(self, inches, speed=-150):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        start_wheel_angle = self.left_wheel.angle()
+        stop_wheel_angle = start_wheel_angle - degrees_to_move
+        self.left_wheel.run(speed)
+        self.right_wheel.run(speed)
+        while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
+            pass
+        while self.color_sensor_right.reflection() > 20 and self.left_wheel.angle() > stop_wheel_angle:
+            pass
+        while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
+            pass
+        self.stop()
+        
+    # Move forward until we see a white line. No gyro corrections are made.
+    def move_to_line_backwards(self, speed=150):
         self.left_wheel.run(speed)
         self.right_wheel.run(speed)
         while self.color_sensor_left.reflection() < 70:
