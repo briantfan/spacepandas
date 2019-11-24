@@ -10,18 +10,19 @@ from pybricks.robotics import DriveBase
 import robot
 
 def run(robot):
-    # Bring the crane attachment down.
+    # Bring in the tower and blocks.
     robot.forward(1, min_speed=-1000, max_speed=-1000)
     wait(1000)
     # Move to the crane/circle fast to save time.
-    robot.forward(18.8)
+    robot.forward(18)
     # Push the crane lever slowly and carefully.
-    robot.forward(3, max_speed=-100)
+    robot.forward(3, max_speed = -100)
     # Wait for the block to fall.
     wait(1000)
     # Move the attachment away so it's not touching the blocks.
-    robot.backward(3)
+    robot.backward(4)
     # Turn and detach from the attachment.
-    robot.turn_left(90, min_speed=-200, max_speed=-200)
+    robot.turn_right(10)
+    robot.turn_left_pivot_back(110, min_speed=-200, max_speed=-400)
     # Go back home.
     robot.forward(20, min_speed=-200)
