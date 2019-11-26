@@ -31,6 +31,7 @@ def run(robot):
    robot.line_follow_to_black()
    # Move up the ramp to the flags.
    robot.forward(25, decel=10000)
+   #Move flags down and use motors.
    robot.left_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
    robot.left_motor.run_angle(-800, 850,Stop.BRAKE, False)
    robot.right_motor.run_angle(800, 850)

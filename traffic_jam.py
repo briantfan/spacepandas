@@ -30,19 +30,23 @@ def run(robot):
     # Follow the line to flip the elevator.
     robot.line_follow(12)
     robot.line_follow_to_end(2)
-    # Goes to do build mission
-    robot.backward(5, max_speed=80)
-    robot.backward (6)
-    robot.turn_left_pivot_back (146)
-    robot.left_motor.run_angle (-800, 320)
-    robot.backward (9)
-    robot.left_motor.run_angle (-800, 50)
-    robot.turn_right (90)
-    robot.forward (1)
-    robot.turn_left (45)
-    robot.forward (4)
-    robot.turn_left (45)
-    robot.forward (10)
-    #robot.backward(18, decel=1000)
-    #robot.turn_right(21, min_speed=120)
-    #robot.backward(58, min_speed=200, max_speed=800)
+    # Goes to do build mission --------------------------
+    #robot.backward(5, max_speed=80)
+    #robot.backward (6)
+    # Sets up to knock down pegs ------------------------
+    #robot.turn_left_pivot_back (140)
+    #robot.left_motor.run_angle (-800, 315)
+    #robot.backward (7)
+    # Does Build Mission --------------------------------
+    #robot.left_motor.run_angle (-800, 50)
+   # robot.turn_right (90)
+    # Exits ----------------------------------------------
+    #wait (3000) # Wait 3 seconds
+    #robot.forward (5)
+    #robot.turn_right (55)
+   # robot.forward (20, min_speed=200)
+    # Goes back to base ----------------------------------
+    #robot.forward (20, min_speed=200)
+    robot.backward(18, decel=1000)
+    robot.turn_right(21, min_speed=120)
+    robot.backward(58, min_speed=200, max_speed=800)
