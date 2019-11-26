@@ -12,21 +12,21 @@ import robot
 
 def run(robot):
     # Go to the tree.
-    robot.forward(33, max_speed=-360, decel=8)
+    robot.forward(35, max_speed=-360, decel=8)
     # Hook the drone
-    robot.left_motor.run_angle(-200, 140, Stop.BRAKE)
+    robot.left_motor.run_angle(400, 360)
     # Lower the blocks and move the drone to the ramp.
-    robot.right_motor.run_angle(-800, 1200, Stop.COAST)
+    robot.right_motor.run_angle(-400, 1000)
     # Put the drone down.
-    robot.right_motor.run_angle(-400, 400, Stop.COAST, False)
-    robot.left_motor.run_angle(100, 200, Stop.COAST)
+    robot.left_motor.run_angle(-400, 900)
     # Lower the blocks.
-    robot.right_motor.run_angle(-800, 400, Stop.COAST)
+    robot.right_motor.run_angle(-400, 500)
     # Back away slowly.
     robot.backward(15, accel=4)
     # Push the right crane lever.
     robot.turn_right(136)
-    robot.backward(12, decel=8)
+    robot.backward(10, decel=4)
+    robot.backward(1)
     # Backup and go home.
     robot.forward(7)
     robot.turn_right(80)
