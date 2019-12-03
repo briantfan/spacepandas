@@ -13,9 +13,9 @@ DEGREES_PER_INCH = 360 / 11.6
 
 # These are the min and max speeds we use for driving and turning.
 MIN_FORWARD_SPEED = -60
-MAX_FORWARD_SPEED = -500
+MAX_FORWARD_SPEED = -800
 MIN_BACKWARD_SPEED = 60
-MAX_BACKWARD_SPEED = 500
+MAX_BACKWARD_SPEED = 800
 
 DEFAULT_MOVE_ACCELERATION = 16
 DEFAULT_MOVE_DECELERATION = 32
@@ -44,6 +44,7 @@ class Robot:
         self.gyro_sensor = GyroSensor(Port.S4, Direction.CLOCKWISE)
         self.left_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
         self.right_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
+        self.stopwatch = StopWatch()
         self.check_gyro()
 
     # Diagnostic test that will beep if the gyro is not calibrated.
@@ -59,6 +60,8 @@ class Robot:
 
     # Stop and brake the wheels.
     def stop(self):
+        self.right_wheel.run(0)
+        self.left_wheel.run(0)
         self.right_wheel.stop(Stop.BRAKE)
         self.left_wheel.stop(Stop.BRAKE)
     
@@ -128,6 +131,25 @@ class Robot:
             print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
         self.stop()
 
+    # Move forward, since the motors are upside-down, speed is negative. Watch both wheels.
+    def forward2(self, inches, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        left_start_angle = self.left_wheel.angle()
+        right_start_angle = self.right_wheel.angle()
+        left_stop_angle = left_start_angle - degrees_to_move
+        right_stop_angle = right_start_angle - degrees_to_move
+        print("Inches in Degrees: ", degrees_to_move, "Start: ", left_start_angle, " Stop: ", left_stop_angle)
+        start_gyro_angle = self.gyro_sensor.angle()
+        current_speed = min_speed
+        while self.left_wheel.angle() > left_stop_angle and self.right_wheel.angle() > right_stop_angle:
+            current_speed = self.calculate_speed(min_speed, max_speed, current_speed, left_start_angle, left_stop_angle, self.left_wheel.angle(), accel, decel)
+            gyro_error = start_gyro_angle - self.gyro_sensor.angle()
+            correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
+            self.left_wheel.run(current_speed + correction)
+            self.right_wheel.run(current_speed - correction)
+            print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
+        self.stop()
+
     # Move backward, since the motors are upside-down, speed is positive.
     def backward(self, inches, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
         degrees_to_move = inches * DEGREES_PER_INCH
@@ -137,6 +159,24 @@ class Robot:
         start_gyro_angle = self.gyro_sensor.angle()
         current_speed = min_speed
         while self.left_wheel.angle() < stop_angle:
+            current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
+            gyro_error = start_gyro_angle - self.gyro_sensor.angle()
+            correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
+            self.left_wheel.run(current_speed - correction)
+            self.right_wheel.run(current_speed + correction)
+            print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
+        self.stop()
+
+    # Move backward, since the motors are upside-down, speed is positive.
+    def backward_or_wait(self, inches, millis, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        start_angle = self.left_wheel.angle()
+        stop_angle = start_angle + degrees_to_move
+        print("Inches in Degrees: ", degrees_to_move, "Start: ", start_angle, " Stop: ", stop_angle)
+        start_gyro_angle = self.gyro_sensor.angle()
+        current_speed = min_speed
+        self.stopwatch.reset()
+        while self.left_wheel.angle() < stop_angle and self.stopwatch.time() < millis:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, start_angle, stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
             correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
@@ -298,3 +338,17 @@ class Robot:
         while self.color_sensor_left.reflection() < 70:
             pass
         self.stop()
+
+    def drive_right(self, degrees, left_speed, right_speed):
+        start_angle = self.gyro_sensor.angle()
+        stop_angle = start_angle + degrees - 1
+        while self.gyro_sensor.angle() < stop_angle:
+            self.right_wheel.run(right_speed)
+            self.left_wheel.run(left_speed)
+
+    def drive_left(self, degrees, left_speed, right_speed):
+        start_angle = self.gyro_sensor.angle()
+        stop_angle = start_angle - degrees + 1
+        while self.gyro_sensor.angle() > stop_angle:
+            self.right_wheel.run(right_speed)
+            self.left_wheel.run(left_speed)

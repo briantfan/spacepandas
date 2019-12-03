@@ -16,7 +16,8 @@ def run(robot):
    robot.turn_left_pivot(45, min_speed=-120)
    robot.turn_right(55)
    # Follow the line a little bit to straighten out.
-   robot.line_follow(6, speed=-80)
+   robot.line_follow(7, speed=-100)
+   brick.sound.beep()
    # Move to the divot in the line.
    robot.line_follow_to_divot(speed=-60)
    # Turn and move into the tan circle.
@@ -25,13 +26,9 @@ def run(robot):
    # Back out of the tan circle.
    robot.backward(7)
    # Turn and face the line.
-   robot.turn_left_pivot_back(45)
+   robot.turn_left_pivot_back(45, min_speed=-200)
   # Follow the line to the ramp.
-   robot.line_follow (4)
+   robot.line_follow(4)
    robot.line_follow_to_black()
    # Move up the ramp to the flags.
-   robot.forward(25, decel=10000)
-   #Move flags down and use motors.
-   robot.left_motor.set_pid_settings(100, 50, 1, 1000, 50, 50, 0, 1000)
-   robot.left_motor.run_angle(-800, 850,Stop.BRAKE, False)
-   robot.right_motor.run_angle(800, 850)
+   robot.forward(24, decel=10000)

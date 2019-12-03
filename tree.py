@@ -1,6 +1,5 @@
 #!/usr/bin/env pybricks-micropython
 
-import time
 from pybricks import ev3brick as brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -12,22 +11,24 @@ import robot
 
 def run(robot):
     # Go to the tree.
-    robot.forward(35, max_speed=-360, decel=8)
+    robot.forward2(37, max_speed=-400, gyro_correct=1500)
     # Hook the drone
-    robot.left_motor.run_angle(400, 360)
+    robot.left_motor.run_angle(1000, 360)
     # Lower the blocks and move the drone to the ramp.
-    robot.right_motor.run_angle(-400, 1000)
+    robot.right_motor.run_angle(-1000, 1000, Stop.BRAKE)
     # Put the drone down.
-    robot.left_motor.run_angle(-400, 900)
+    robot.left_motor.run_angle(-1000, 900, Stop.BRAKE)
     # Lower the blocks.
-    robot.right_motor.run_angle(-400, 500)
-    # Back away slowly.
-    robot.backward(15, accel=4)
+    robot.right_motor.run_angle(-1000, 500, Stop.BRAKE)
+    # Back away.
+    robot.backward(12, accel=8)
     # Push the right crane lever.
-    robot.turn_right(136)
-    robot.backward(10, decel=4)
-    robot.backward(1)
+    robot.turn_right(45)
+    robot.backward(4)
+    robot.turn_right(88)
+    robot.backward_or_wait(8.5, 2000)
+    robot.backward_or_wait(2, 1000, min_speed=120, max_speed=120)
     # Backup and go home.
-    robot.forward(7)
-    robot.turn_right(80)
-    robot.forward(28)
+    robot.drive_right(90, -600, -400)
+    robot.forward(17, min_speed=-600, max_speed=-600)
+
