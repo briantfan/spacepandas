@@ -14,7 +14,7 @@ def run(robot):
     robot.forward(1, min_speed=-1000, max_speed=-1000)
     wait(1000)
     # Move to the crane/circle fast to save time.
-    robot.forward(20)
+    robot.forward(19)
     # Push the crane lever slowly and carefully.
     robot.forward(1, max_speed=-120)
     # Wait for the block to fall.

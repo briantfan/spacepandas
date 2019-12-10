@@ -14,10 +14,9 @@ def run(robot):
    robot.forward(26)
    # Push the red blocks into the circle.
    robot.turn_left_pivot(45, min_speed=-120)
-   robot.turn_right(55)
+   robot.turn_right(60)
    # Follow the line a little bit to straighten out.
    robot.line_follow(7, speed=-100)
-   brick.sound.beep()
    # Move to the divot in the line.
    robot.line_follow_to_divot(speed=-60)
    # Turn and move into the tan circle.
@@ -26,7 +25,7 @@ def run(robot):
    # Back out of the tan circle.
    robot.backward(7)
    # Turn and face the line.
-   robot.turn_left_pivot_back(45, min_speed=-200)
+   robot.turn_left_pivot_back(40, min_speed=-200)
   # Follow the line to the ramp.
    robot.line_follow(4)
    robot.line_follow_to_black()

@@ -132,7 +132,7 @@ class Robot:
         self.stop()
 
     # Move forward, since the motors are upside-down, speed is negative. Watch both wheels.
-    def forward2(self, inches, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
+    def forward2(self, inches, millis, min_speed=MIN_FORWARD_SPEED, max_speed=MAX_FORWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
         degrees_to_move = inches * DEGREES_PER_INCH
         left_start_angle = self.left_wheel.angle()
         right_start_angle = self.right_wheel.angle()
@@ -141,7 +141,8 @@ class Robot:
         print("Inches in Degrees: ", degrees_to_move, "Start: ", left_start_angle, " Stop: ", left_stop_angle)
         start_gyro_angle = self.gyro_sensor.angle()
         current_speed = min_speed
-        while self.left_wheel.angle() > left_stop_angle and self.right_wheel.angle() > right_stop_angle:
+        self.stopwatch.reset()
+        while self.left_wheel.angle() > left_stop_angle and self.right_wheel.angle() > right_stop_angle and self.stopwatch.time() < millis:
             current_speed = self.calculate_speed(min_speed, max_speed, current_speed, left_start_angle, left_stop_angle, self.left_wheel.angle(), accel, decel)
             gyro_error = start_gyro_angle - self.gyro_sensor.angle()
             correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
@@ -369,13 +370,13 @@ class Robot:
         self.right_wheel.run(speed)
         while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
             pass
-        brick.sound.beep()
+        #brick.sound.beep()
         while self.color_sensor_right.reflection() > 20 and self.left_wheel.angle() > stop_wheel_angle:
             pass
-        brick.sound.beep()
+        #brick.sound.beep()
         while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
             pass
-        brick.sound.beep()
+        #brick.sound.beep()
         self.stop()
         
     # Move forward until we see a white line. No gyro corrections are made.

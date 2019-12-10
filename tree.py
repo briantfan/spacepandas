@@ -11,7 +11,7 @@ import robot
 
 def run(robot):
     # Go to the tree.
-    robot.forward2(37, max_speed=-400, gyro_correct=1500)
+    robot.forward2(37, 3000, max_speed=-400, gyro_correct=1500)
     # Hook the drone
     robot.left_motor.run_angle(1000, 360)
     # Lower the blocks and move the drone to the ramp.

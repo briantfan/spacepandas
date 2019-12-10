@@ -37,11 +37,11 @@ def run(robot):
     robot.backward(5, max_speed=80, gyro_correct=0)
     robot.backward(6, gyro_correct=0)
     # Sets up to knock down two blue pegs
-    robot.left_motor.run_angle(-800, 315, Stop.BRAKE, False)
+    robot.left_motor.run_angle(-800, 320, Stop.BRAKE, False)
     robot.turn_left_pivot_back(142, min_speed=-180)
     robot.backward_or_wait(7, 2000)
     # Does Build Mission
-    robot.left_motor.run_angle(-800, 80)
+    robot.left_motor.run_angle(-800, 75)
     robot.turn_right(90)
   # Goes back to base
     robot.left_motor.run_angle(800, 500, Stop.BRAKE, False)
