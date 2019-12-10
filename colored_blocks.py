@@ -31,4 +31,4 @@ def run(robot):
    robot.line_follow(4)
    robot.line_follow_to_black()
    # Move up the ramp to the flags.
-   robot.forward(24, decel=10000)
+   robot.forward(23, decel=10000)

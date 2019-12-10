@@ -168,6 +168,25 @@ class Robot:
         self.stop()
 
     # Move backward, since the motors are upside-down, speed is positive.
+    def backward2(self, inches, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        left_start_angle = self.left_wheel.angle()
+        right_start_angle = self.right_wheel.angle()
+        left_stop_angle = left_start_angle + degrees_to_move
+        right_stop_angle = right_start_angle + degrees_to_move
+        print("Inches in Degrees: ", degrees_to_move, "Start: ", left_start_angle, " Stop: ", left_stop_angle)
+        start_gyro_angle = self.gyro_sensor.angle()
+        current_speed = min_speed
+        while self.left_wheel.angle() < left_stop_angle and self.right_wheel.angle() < right_stop_angle:
+            current_speed = self.calculate_speed(min_speed, max_speed, current_speed, left_start_angle, left_stop_angle, self.left_wheel.angle(), accel, decel)
+            gyro_error = start_gyro_angle - self.gyro_sensor.angle()
+            correction = self.range_check(gyro_error * gyro_correct / current_speed, -100, 100)
+            self.left_wheel.run(current_speed - correction)
+            self.right_wheel.run(current_speed + correction)
+            print("Angle: ", self.left_wheel.angle(), " Speed: ", current_speed, "Error: ", gyro_error, " Correction: ", correction)
+        self.stop()
+
+    # Move backward, since the motors are upside-down, speed is positive.
     def backward_or_wait(self, inches, millis, min_speed=MIN_BACKWARD_SPEED, max_speed=MAX_BACKWARD_SPEED, accel=DEFAULT_MOVE_ACCELERATION, decel=DEFAULT_MOVE_DECELERATION, gyro_correct=GYRO_CORRECTION):
         degrees_to_move = inches * DEGREES_PER_INCH
         start_angle = self.left_wheel.angle()
@@ -222,6 +241,15 @@ class Robot:
             print("Angle: ", self.gyro_sensor.angle(), " Right Speed: ", right_speed)
         self.stop()
     
+    # Turn left based on our absolute heading.
+    # The gyro sensor must be calibrated and reset for this to work.
+    def turn_left_absolute2(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
+        print("Turn left absolute 2:  start: ", self.gyro_sensor.angle(), "  target: ", degrees)
+        while self.gyro_sensor.angle() > degrees:
+            self.left_wheel.run(min_speed)
+            print("Angle: ", self.gyro_sensor.angle(), " Left Speed: ", min_speed)
+        self.stop()
+    
     # Turn left by pivoting on the left wheel and moving the right wheel forward.
     def turn_left_pivot(self, degrees, min_speed=MIN_LEFT_TURN_SPEED, max_speed=MAX_LEFT_TURN_SPEED, accel=DEFAULT_TURN_ACCELERATION, decel=DEFAULT_TURN_DECELERATION):
         start_angle = self.gyro_sensor.angle()
@@ -273,6 +301,22 @@ class Robot:
             self.right_wheel.run(speed - correction)
         self.stop()
 
+    # Line follow for a certain distance. This can be inaccurate because of line following adjustments.
+    def line_follow2(self, inches, speed=LINE_FOLLOW_SPEED):
+        degrees_to_move = inches * DEGREES_PER_INCH
+        left_start_wheel_angle = self.left_wheel.angle()
+        right_start_wheel_angle = self.right_wheel.angle()
+        left_stop_wheel_angle = left_start_wheel_angle - degrees_to_move
+        right_stop_wheel_angle = right_start_wheel_angle - degrees_to_move
+        while self.left_wheel.angle() > left_stop_wheel_angle and self.right_wheel.angle() > right_stop_wheel_angle:
+            right_reflection = self.color_sensor_right.reflection()
+            left_reflection = self.color_sensor_left.reflection()
+            diff = (right_reflection - left_reflection)
+            correction = diff
+            self.left_wheel.run(speed + correction)
+            self.right_wheel.run(speed - correction)
+        self.stop()
+
     #Line follow until we reach the first divot in the longest line.
     def line_follow_to_divot(self, speed=LINE_FOLLOW_SPEED):
         biggest = 0
@@ -306,7 +350,7 @@ class Robot:
         start_wheel_angle = self.left_wheel.angle()
         stop_wheel_angle = start_wheel_angle - degrees_to_move
         while self.left_wheel.angle() > stop_wheel_angle and self.color_sensor_left.reflection() < 80 and self.color_sensor_right.reflection() < 80:
-            if self.color_sensor_left.reflection() < 15 and self.color_sensor_right.reflection() < 15:
+            if self.color_sensor_left.reflection() < 25 and self.color_sensor_right.reflection() < 25:
                 break
             right_reflection = self.color_sensor_right.reflection()
             left_reflection = self.color_sensor_left.reflection()
@@ -325,10 +369,13 @@ class Robot:
         self.right_wheel.run(speed)
         while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
             pass
+        brick.sound.beep()
         while self.color_sensor_right.reflection() > 20 and self.left_wheel.angle() > stop_wheel_angle:
             pass
+        brick.sound.beep()
         while self.color_sensor_right.reflection() < 70 and self.left_wheel.angle() > stop_wheel_angle:
             pass
+        brick.sound.beep()
         self.stop()
         
     # Move forward until we see a white line. No gyro corrections are made.
