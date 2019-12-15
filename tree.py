@@ -13,13 +13,10 @@ def run(robot):
     # Go to the tree.
     robot.forward2(37, 3000, max_speed=-400, gyro_correct=1500)
     # Hook the drone
-    robot.left_motor.run_angle(1000, 360)
-    # Lower the blocks and move the drone to the ramp.
-    robot.right_motor.run_angle(-1000, 1000, Stop.BRAKE)
-    # Put the drone down.
-    robot.left_motor.run_angle(-1000, 900, Stop.BRAKE)
+    robot.right_motor.run_angle(-1000, 650, Stop.BRAKE, False)
+    robot.left_motor.run_angle(500, 1100)
     # Lower the blocks.
-    robot.right_motor.run_angle(-1000, 500, Stop.BRAKE)
+    robot.right_motor.run_angle(-1000, 850)
     # Back away.
     robot.backward(12, accel=8)
     # Push the right crane lever.
