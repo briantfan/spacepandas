@@ -12,6 +12,10 @@ import robot
 def run(robot):
     # Go to the tree.
     robot.forward2(37, 3000, max_speed=-400, gyro_correct=1500)
+    robot.right_wheel.run_angle(-300, 90)
+    robot.right_wheel.stop()
+    robot.left_wheel.run_angle(-300, 90)
+    robot.left_wheel.stop()
     # Hook the drone
     robot.right_motor.run_angle(-1000, 650, Stop.BRAKE, False)
     robot.left_motor.run_angle(500, 1100)
